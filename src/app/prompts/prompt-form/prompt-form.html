@@ -1,0 +1,36 @@
+<p-card>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="p-field">
+            <label for="title">Title</label>
+            <input id="title" formControlName="title" type="text" pInputText
+                class="w-full" />
+            <small class="invalid-feedback">Le tritre est requis max(30
+                caract)</small>
+        </div>
+        <div class="p-field">
+            <label for="content">Content</label>
+            <textarea id="content" formControlName="content" pTextarea
+                class="w-full"></textarea>
+            <small class="invalid-feedback">Le contenu est requis</small>
+        </div>
+        <div class="p-field">
+            <label for="category">Category</label>
+            <p-select inputId="category" optionValue="id" optionLabel="name"
+                class="w-full" [options]="categories()"
+                formControlName="categoryId" />
+            <small class="invalid-feedback">La catégorie est requise</small>
+
+        </div>
+        <div class="flex justify-content-end gap-2 mt-3 ">
+            <!--Delete Uniquement en mode modification-->
+            @if (promptId()) {
+            <p-button class="mr-auto" label="Supprimer" severity="danger"
+                (onClick)="deletePrompt()" [outlined]="true" />
+            }
+            <p-button routerLink="/prompts" label="Cancel"
+                severity="secondary" />
+            <p-button type="submit"
+                [label]=" promptId()? 'Modifier': 'Créer' " />
+        </div>
+    </form>
+</p-card>
