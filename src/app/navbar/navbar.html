@@ -4,8 +4,13 @@
             <img ngSrc="/logo-prompt-hub.png" alt="logo" width="36" height="36">
             Prompt Hub
         </a>
-        <div class="flex gap-2">
-            <p-button routerLink="/auth" label="Connexion" size="small" severity="secondary" />
+        <div class="flex gap-2 align-items-center">
+            @if (authService.currentUser(); as currentUser ) {
+                <span class="text-sm text-color-secondary" > {{currentUser.username}} </span>
+                <p-button (onClick)="logout()" label="Déconnexion" size="small" severity="secondary" />
+            }@else{
+                <p-button routerLink="/auth" label="Connexion" size="small" severity="secondary" />
+            }
 
             <p-button [icon]="isDark() ? 'pi pi-sun' : 'pi pi-moon'"
                 size="small"
