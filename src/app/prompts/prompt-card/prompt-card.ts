@@ -1,11 +1,12 @@
-import { Component, computed, inject, input } from '@angular/core'
+import { Component, computed, inject, input, linkedSignal } from '@angular/core'
 import { Prompt } from '../prompt.model'
 import { Button, ButtonModule } from 'primeng/button';
 import { TextareaModule, Textarea } from 'primeng/textarea';
 import { TagModule, Tag } from 'primeng/tag';
 import { CardModule, Card } from 'primeng/card';
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { AuthService } from '../../auth/auth-service';
+import { PromptService } from '../prompt-service';
 
 
 
@@ -18,7 +19,18 @@ import { AuthService } from '../../auth/auth-service';
 export class PromptCard {
   prompt = input.required<Prompt>()
 
-  authService = inject(AuthService)
+  authService = inject(AuthService) 
+
+  promptService = inject(PromptService) 
+
+  // injection de la route pour naviguer
+  router = inject(Router)
+
+  //LinkedSignal pour initialiser le signal avec la valeur du prompt passé en input et pouvoir le mettre à jour après un upvote ou downvote
+  score = linkedSignal(() => this.prompt().score)
+
+  // currentUser est un signal qui contient l'utilisateur connecté, on utilise linkedSignal pour que userVote soit mis à jour automatiquement quand currentUser change (ex: quand l'utilisateur se connecte ou se déconnecte)
+  userVote = linkedSignal(() => (this.authService.currentUser() ? this.prompt().userVote : null))
 
   //ajout de l'attribut canEdit pour vérifier si l'utilisateur connecté est l'auteur du prompt
   canEdit = computed(() => {
@@ -29,6 +41,30 @@ export class PromptCard {
   copyToClipboard() {
     void navigator.clipboard.writeText(this.prompt().content)
   }
-  
+
+  upvote(){
+    if(! this.authService.currentUser()){
+      void this.router.navigate(['/auth']) //void pour ignorer la promesse retournée par navigate
+      return
+    }
+    this.promptService.upvotePrompt(this.prompt().id).subscribe((updatePompt) => {
+      this.score.set(updatePompt.score)
+      this.userVote.set(updatePompt.userVote)
+    })
+  }
+
+  downvote(){
+    if(! this.authService.currentUser()){
+      void this.router.navigate(['/auth']) //void pour ignorer la promesse retournée par navigate
+      return
+    }
+    this.promptService.downvotePrompt(this.prompt().id).subscribe((updatePompt) => {
+      this.score.set(updatePompt.score)
+      this.userVote.set(updatePompt.userVote) 
+    })
+  }
+
+
+
 }
 

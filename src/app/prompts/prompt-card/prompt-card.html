@@ -18,9 +18,9 @@
   <div class="flex justify-content-between align-items-center">
     <p-tag [value]="prompt().category.name" severity="secondary" />
     <div class="flex gap-2 align-items-center">
-      <p-button icon="pi pi-thumbs-up" size="small" severity="secondary" />
-      <span> {{prompt().score}} </span>
-      <p-button icon="pi pi-thumbs-down" size="small" severity="secondary" />
+      <p-button (onClick)="upvote()" icon="pi pi-thumbs-up" size="small" [severity]="userVote() === 'up' ? 'primary' : 'secondary'" />
+      <span> {{score()}} </span>
+      <p-button (onClick)="downvote()" icon="pi pi-thumbs-down" size="small" [severity]="userVote() === 'down' ? 'primary' : 'secondary'" />
     </div>
   </div>
 </p-card>
