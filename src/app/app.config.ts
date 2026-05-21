@@ -9,6 +9,7 @@ import { semantic } from '@primeuix/themes/aura/base';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './auth/auth-interceptor';
 import { AuthService } from './auth/auth-service';
+import { MessageService } from 'primeng/api';
 
 
 const promptPreset = definePreset(Aura,{
@@ -42,6 +43,9 @@ export const appConfig: ApplicationConfig = {
           darkModeSelector: '.app-dark',
         }
       }
-    })
+    }),
+    MessageService
   ],
 }
+
+

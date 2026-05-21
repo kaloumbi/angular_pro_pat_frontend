@@ -9,6 +9,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Button } from 'primeng/button'
 import { PromptService } from '../prompt-service'
 import { Router, RouterLink } from '@angular/router'
+import { MessageService } from 'primeng/api'
 
 @Component({
   selector: 'app-prompt-form',
@@ -24,6 +25,9 @@ export class PromptForm {
   categroyService = inject(CategoryService)
 
   promptId = input<number>()
+
+  // Injection du message Service
+  messageService = inject(MessageService)
 
   categories = toSignal(this.categroyService.getCategories(), { initialValue: [] })
 
@@ -68,19 +72,44 @@ export class PromptForm {
     if (promptId) {
       //Mode modification
       this.promptService.updatePrompt(promptId, prompt).subscribe(() => {
+        // Affiche un message de succès
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Modifié',
+          detail: 'Le prompt a été modifié avec succès',
+        })
         void this.router.navigate(['/prompts'])
       })
     } else {
       //Mode création
       this.promptService.createPrompt(prompt).subscribe(() => {
+        // Affiche un message de succès
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Créé',
+          detail: 'Le prompt a été créé avec succès',
+        })
         void this.router.navigate(['/prompts'])
       })
     }
   }
 
-  //delete prompt
-  deletePrompt(){
+  //delete prompt sans toast
+  /* deletePrompt() {
     this.promptService.deletePrompt(this.promptId()!).subscribe(() => {
+      void this.router.navigate(['/prompts'])
+    })
+  } */
+
+  //delete prompt avec toast de confirmation
+  deletePrompt() {
+    this.promptService.deletePrompt(this.promptId()!).subscribe(() => {
+      // Affiche un message de succès
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Supprimé',
+        detail: 'Le prompt a été supprimé avec succès',
+      })
       void this.router.navigate(['/prompts'])
     })
   }
