@@ -1,11 +1,12 @@
 import { Component, inject, signal } from '@angular/core'
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
-import { Card } from "primeng/card";
-import { Button } from "primeng/button";
-import { InputText } from "primeng/inputtext";
-import { Password } from "primeng/password";
-import { AuthService } from '../auth-service';
-import { Router } from '@angular/router';
+import { Card } from 'primeng/card'
+import { Button } from 'primeng/button'
+import { InputText } from 'primeng/inputtext'
+import { Password } from 'primeng/password'
+import { AuthService } from '../auth-service'
+import { Router } from '@angular/router'
+import { MessageService } from 'primeng/api'
 
 @Component({
   selector: 'app-auth-form',
@@ -14,9 +15,11 @@ import { Router } from '@angular/router';
   styleUrl: './auth-form.scss',
 })
 export class AuthForm {
-
   //injection du service d'authentification pour pouvoir appeler les méthodes de login et register
   authService = inject(AuthService)
+
+  //Injection du message service pour afficher des messages à l'utilisateur en cas d'erreur de login ou register
+  messageService = inject(MessageService)
 
   //Router de navigation pour rediriger l'utilisateur après login ou register
   router = inject(Router)
@@ -39,8 +42,8 @@ export class AuthForm {
   }
 
   submit() {
-    console.log("data", this.form.value);
-    
+    console.log('data', this.form.value)
+
     this.form.markAllAsTouched()
     if (this.form.invalid) return
 
@@ -56,8 +59,17 @@ export class AuthForm {
   }
 
   login(username: string, password: string) {
-    this.authService.login(username, password).subscribe(() =>  {
-      void this.router.navigate(['/'])
+    this.authService.login(username, password).subscribe({
+      next: () => {
+        void this.router.navigate(['/'])
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Connexion impossible, reessayez.',
+        })
+      },
     })
   }
 
@@ -66,5 +78,4 @@ export class AuthForm {
       void this.router.navigate(['/'])
     })
   }
-
 }
