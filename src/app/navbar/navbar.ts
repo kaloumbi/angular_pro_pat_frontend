@@ -18,6 +18,9 @@ export class Navbar {
 
   isDark = signal(localStorage.getItem(this.DARK_MODE_KEY) === 'true')
 
+  //loading
+  loggingOut = signal(false)
+
   //creon un fonction qui permet d'exuter du code quand un signal change de valeur
   constructor() {
     effect(() => {
@@ -30,9 +33,11 @@ export class Navbar {
   router = inject(Router)
 
   logout = () => {
+    this.loggingOut.set(true)
     this.authService.logout().subscribe(() => {
       // La déconnexion a réussi, vous pouvez effectuer des actions supplémentaires ici si nécessaire
       this.router.navigate(['/'])
+      this.loggingOut.set(false)
     })
   }
 }

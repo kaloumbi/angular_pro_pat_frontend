@@ -7,16 +7,20 @@ import { Password } from 'primeng/password'
 import { AuthService } from '../auth-service'
 import { Router } from '@angular/router'
 import { MessageService } from 'primeng/api'
+import { ProgressSpinner } from "primeng/progressspinner";
 
 @Component({
   selector: 'app-auth-form',
-  imports: [ReactiveFormsModule, Card, Button, InputText, Password],
+  imports: [ReactiveFormsModule, Card, Button, InputText, Password, ProgressSpinner],
   templateUrl: './auth-form.html',
   styleUrl: './auth-form.scss',
 })
 export class AuthForm {
   //injection du service d'authentification pour pouvoir appeler les méthodes de login et register
   authService = inject(AuthService)
+
+  //loadin
+  submitting = signal(false)
 
   //Injection du message service pour afficher des messages à l'utilisateur en cas d'erreur de login ou register
   messageService = inject(MessageService)
@@ -48,7 +52,7 @@ export class AuthForm {
     if (this.form.invalid) return
 
     const { username, password } = this.form.getRawValue()
-
+    this.submitting.set(true)
     if (this.mode() === 'login') {
       //console.log('Login with', this.form.getRawValue())
       this.login(username, password)
@@ -62,8 +66,10 @@ export class AuthForm {
     this.authService.login(username, password).subscribe({
       next: () => {
         void this.router.navigate(['/'])
+        this.submitting.set(false)
       },
       error: () => {
+        this.submitting.set(false)
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur',
@@ -76,6 +82,7 @@ export class AuthForm {
   register(username: string, password: string) {
     this.authService.register(username, password).subscribe(() => {
       void this.router.navigate(['/'])
+      this.submitting.set(false)
     })
   }
 }

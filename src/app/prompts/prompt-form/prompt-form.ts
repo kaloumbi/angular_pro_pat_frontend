@@ -1,4 +1,4 @@
-import { Component, effect, inject, input } from '@angular/core'
+import { Component, effect, inject, input, signal } from '@angular/core'
 import { Card } from 'primeng/card'
 import { Textarea } from 'primeng/textarea'
 import { InputTextModule, InputText } from 'primeng/inputtext'
@@ -10,10 +10,11 @@ import { Button } from 'primeng/button'
 import { PromptService } from '../prompt-service'
 import { Router, RouterLink } from '@angular/router'
 import { MessageService } from 'primeng/api'
+import { ProgressSpinner } from "primeng/progressspinner";
 
 @Component({
   selector: 'app-prompt-form',
-  imports: [Card, Textarea, InputText, Select, ReactiveFormsModule, Button, RouterLink],
+  imports: [Card, Textarea, InputText, Select, ReactiveFormsModule, Button, RouterLink, ProgressSpinner],
   templateUrl: './prompt-form.html',
   styleUrl: './prompt-form.scss',
 })
@@ -24,7 +25,17 @@ export class PromptForm {
 
   categroyService = inject(CategoryService)
 
+  //loader 
+  loading = signal(false)
+
+  //spinner for form submission
+  submitting = signal(false)
+
+   //spinner for form submission
+  deleting = signal(false)
+
   promptId = input<number>()
+
 
   // Injection du message Service
   messageService = inject(MessageService)
@@ -50,12 +61,14 @@ export class PromptForm {
       const promptId = this.promptId()
       //si promptId est setté, on fetch le prompt et on préremplit le formulaire
       if (promptId) {
+        this.loading.set(true)
         this.promptService.getPrompt(promptId).subscribe((prompt) => {
           this.form.patchValue({
             title: prompt.title,
             content: prompt.content,
             categoryId: prompt.category.id,
           })
+          this.loading.set(false)
         })
       }
     })
@@ -69,6 +82,7 @@ export class PromptForm {
     const prompt = this.form.getRawValue()
     const promptId = this.promptId()
 
+    this.submitting.set(true)
     if (promptId) {
       //Mode modification
       this.promptService.updatePrompt(promptId, prompt).subscribe(() => {
@@ -79,6 +93,7 @@ export class PromptForm {
           detail: 'Le prompt a été modifié avec succès',
         })
         void this.router.navigate(['/prompts'])
+        this.submitting.set(false)
       })
     } else {
       //Mode création
@@ -90,6 +105,7 @@ export class PromptForm {
           detail: 'Le prompt a été créé avec succès',
         })
         void this.router.navigate(['/prompts'])
+        this.submitting.set(false)
       })
     }
   }
@@ -103,6 +119,7 @@ export class PromptForm {
 
   //delete prompt avec toast de confirmation
   deletePrompt() {
+    this.deleting.set(true)
     this.promptService.deletePrompt(this.promptId()!).subscribe(() => {
       // Affiche un message de succès
       this.messageService.add({
@@ -111,6 +128,7 @@ export class PromptForm {
         detail: 'Le prompt a été supprimé avec succès',
       })
       void this.router.navigate(['/prompts'])
+      this.deleting.set(false)
     })
   }
 }

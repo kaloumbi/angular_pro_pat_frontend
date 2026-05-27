@@ -7,7 +7,7 @@
         <div class="flex gap-2 align-items-center">
             @if (authService.currentUser(); as currentUser ) {
                 <span class="text-sm text-color-secondary" > {{currentUser.username}} </span>
-                <p-button (onClick)="logout()" label="Déconnexion" size="small" severity="secondary" />
+                <p-button [loading]="loggingOut()" (onClick)="logout()" label="Déconnexion" size="small" severity="secondary" />
             }@else{
                 <p-button routerLink="/auth" label="Connexion" size="small" severity="secondary" />
             }

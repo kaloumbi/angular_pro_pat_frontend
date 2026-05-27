@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, linkedSignal } from '@angular/core'
+import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core'
 import { Prompt } from '../prompt.model'
 import { Button, ButtonModule } from 'primeng/button'
 import { TextareaModule, Textarea } from 'primeng/textarea'
@@ -18,6 +18,9 @@ import { MessageService } from 'primeng/api'
 })
 export class PromptCard {
   prompt = input.required<Prompt>()
+
+  //vote and unvote
+  voting = signal(false)
 
   authService = inject(AuthService)
 
@@ -63,9 +66,11 @@ export class PromptCard {
       void this.router.navigate(['/auth']) //void pour ignorer la promesse retournée par navigate
       return
     }
+    this.voting.set(true)
     this.promptService.upvotePrompt(this.prompt().id).subscribe((updatePompt) => {
       this.score.set(updatePompt.score)
       this.userVote.set(updatePompt.userVote)
+      this.voting.set(false)
     })
   }
 
@@ -74,9 +79,11 @@ export class PromptCard {
       void this.router.navigate(['/auth']) //void pour ignorer la promesse retournée par navigate
       return
     }
+    this.voting.set(true)
     this.promptService.downvotePrompt(this.prompt().id).subscribe((updatePompt) => {
       this.score.set(updatePompt.score)
       this.userVote.set(updatePompt.userVote)
+      this.voting.set(false)
     })
   }
 }

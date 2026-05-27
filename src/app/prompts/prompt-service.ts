@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core'
 import { Prompt } from './prompt.model'
 import { HttpClient } from '@angular/common/http'
 import { environment } from '../../environments/environment'
+import { delay } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
@@ -38,10 +39,10 @@ export class PromptService {
 
   
   upvotePrompt(promptId: number) {
-    return this.httpClient.post<Prompt>(`${this.baseUrl}/${promptId}/upvote`, null);
+    return this.httpClient.post<Prompt>(`${this.baseUrl}/${promptId}/upvote`, null)
   }
 
   downvotePrompt(promptId: number) {
-    return this.httpClient.post<Prompt>(`${this.baseUrl}/${promptId}/downvote`, null);
+    return this.httpClient.post<Prompt>(`${this.baseUrl}/${promptId}/downvote`, null)
   }
 }
